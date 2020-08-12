@@ -1,10 +1,11 @@
-import axios from "axios";
+import axios from "axios"
+
+const google_key = process.env.GOOGLE_API_KEY
+console.log("key: " + google_key)
 
 const form = document.querySelector("form")!;
 const addressInput = document.getElementById("address")! as HTMLInputElement;
-
-const GOOGLE_API_KEY = "AIzaSyDzotL1qLxLSMMMDapOANZ2Fp1jLDjcso8";
-
+ 
 // google not available globaly because it's JS, not TS
 // had to be declared
 // declare var google: any;
@@ -32,7 +33,7 @@ function searchAddressHandler(event: Event) {
     .get<GoogleGeocodingResponse>( // adding a response type
       `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURI(
         enteredAddress
-      )}&key=${GOOGLE_API_KEY}`
+      )}&key=${google_key}`
     )
     .then((response) => {
       if (response.data.status !== "OK") {
@@ -41,10 +42,13 @@ function searchAddressHandler(event: Event) {
       // typescript cannot guess what type of response is there, also no autocompletion
       const coordinates = response.data.results[0].geometry.location;
 
-      const map = new google.maps.Map(document.getElementById("map")! as HTMLElement, {
-        center: coordinates,
-        zoom: 14,
-      });
+      const map = new google.maps.Map(
+        document.getElementById("map")! as HTMLElement,
+        {
+          center: coordinates,
+          zoom: 14,
+        }
+      );
 
       new google.maps.Marker({ position: coordinates, map: map });
     })
@@ -57,5 +61,5 @@ form.addEventListener("submit", searchAddressHandler)!;
 
 // If we have any google API mistake, typescript & webpack wont report because we were not type specific
 // So we wont get any console error, just an error when sending a request
-// We can ensure that Types knows Google with @types/googlemaps 
+// We can ensure that Types knows Google with @types/googlemaps
 // Now we dont have to declare, we have autocompletion for functions
